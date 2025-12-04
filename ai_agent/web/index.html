@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShifaMart+ AI Health Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --accent: #22c55e;
+            --accent-light: #4ade80;
+            --accent-glow: rgba(34, 197, 94, 0.3);
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --text-muted: #64748b;
+            --border: #475569;
+            --radius: 16px;
+            --radius-sm: 10px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent) 0%, #059669 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .brand-name {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--accent);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Sidebar - Quick Symptoms */
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+        }
+
+        .panel-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .symptom-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .quick-symptom {
+            background: var(--bg-card);
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            padding: 10px 8px;
+            font-size: 12px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-family: inherit;
+        }
+
+        .quick-symptom:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .quick-symptom.selected {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent-light);
+        }
+
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        /* Progress Steps */
+        .progress-bar {
+            display: flex;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            gap: 20px;
+            overflow-x: auto;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .step-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .step-dot.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--bg-primary);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .step-dot.done {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--bg-primary);
+        }
+
+        .step-label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .step-label.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        /* Messages */
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .messages::-webkit-scrollbar { width: 6px; }
+        .messages::-webkit-scrollbar-track { background: transparent; }
+        .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 85%;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        .message.bot { align-self: flex-start; }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .message.user .avatar { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); }
+        .message.bot .avatar { background: linear-gradient(135deg, var(--accent) 0%, #059669 100%); }
+
+        .bubble {
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .message.user .bubble {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.bot .bubble {
+            background: var(--bg-card);
+            border-bottom-left-radius: 4px;
+        }
+
+        .bubble strong { color: var(--accent-light); }
+
+        /* Collected Symptoms */
+        .collected-symptoms {
+            background: var(--bg-primary);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            margin-top: 12px;
+        }
+
+        .collected-symptoms h5 {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .symptom-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, var(--accent) 0%, #059669 100%);
+            color: var(--bg-primary);
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        /* Prediction Cards */
+        .predictions-grid {
+            display: grid;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .prediction-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            transition: all 0.2s;
+        }
+
+        .prediction-card:hover {
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }
+
+        .prediction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .disease-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text);
+        }
+
+        .confidence-badge {
+            background: var(--accent);
+            color: var(--bg-primary);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: monospace;
+        }
+
+        .severity-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .severity-mild { background: rgba(34, 197, 94, 0.2); color: var(--accent); }
+        .severity-moderate { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .severity-severe { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+        .precautions-list {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        /* Specialist Card */
+        .specialist-card {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-card) 100%);
+            border: 1px solid var(--accent);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        .specialist-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .specialist-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .specialist-name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .specialist-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        .find-specialist-btn {
+            width: 100%;
+            margin-top: 12px;
+            background: var(--accent);
+            border: none;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            color: var(--bg-primary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .find-specialist-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        /* Quick Suggestions */
+        .suggestions-area {
+            padding: 12px 20px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .suggestion-chip {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .suggestion-chip:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+        }
+
+        /* Input Area */
+        .input-area {
+            display: flex;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border);
+        }
+
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0 16px;
+            transition: all 0.2s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        #messageInput {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 14px 0;
+            color: var(--text);
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        #messageInput::placeholder { color: var(--text-muted); }
+
+        .voice-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+            transition: all 0.2s;
+        }
+
+        .voice-btn:hover { color: var(--accent); }
+        .voice-btn.recording { color: var(--danger); animation: pulse 1s infinite; }
+
+        #sendBtn {
+            background: linear-gradient(135deg, var(--accent) 0%, #059669 100%);
+            border: none;
+            border-radius: var(--radius);
+            width: 52px;
+            height: 52px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        #sendBtn:hover {
+            transform: scale(1.05);
+        }
+
+        #sendBtn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Typing Indicator */
+        .typing {
+            display: flex;
+            gap: 4px;
+            padding: 8px 12px;
+        }
+
+        .typing span {
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .typing span:nth-child(1) { animation-delay: 0s; }
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main { padding: 10px; }
+        }
+
+        @media (max-width: 600px) {
+            .header { padding: 12px 16px; }
+            .brand-name { font-size: 18px; }
+            .status-pill { display: none; }
+            .progress-bar { padding: 12px 16px; gap: 12px; }
+            .step-label { display: none; }
+            .messages { padding: 16px; }
+            .message { max-width: 95%; }
+            .input-area { padding: 12px; }
+        }
+
+        /* Emergency Alert */
+        .emergency-box {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
+            border: 2px solid var(--danger);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        .emergency-box h4 {
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .emergency-btn {
+            background: var(--danger);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="brand">
+            <div class="logo">🏥</div>
+            <span class="brand-name">ShifaMart+</span>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <button id="clearBtn" style="background: var(--bg-card); border: 1px solid var(--border); color: var(--text-dim); padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-dim)'">
+                🗑️ Clear Chat
+            </button>
+            <div class="status-pill">
+                <span class="status-dot"></span>
+                AI Ready
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <!-- Sidebar with Quick Symptoms -->
+        <aside class="sidebar">
+            <div class="panel">
+                <div class="panel-title">⚡ Quick Symptoms</div>
+                <div class="symptom-grid" id="quickSymptoms">
+                    <button class="quick-symptom" data-symptom="fever">🤒 Fever</button>
+                    <button class="quick-symptom" data-symptom="headache">🤕 Headache</button>
+                    <button class="quick-symptom" data-symptom="cough">😷 Cough</button>
+                    <button class="quick-symptom" data-symptom="stomach pain">🤢 Stomach</button>
+                    <button class="quick-symptom" data-symptom="fatigue">😴 Fatigue</button>
+                    <button class="quick-symptom" data-symptom="body ache">💪 Body Ache</button>
+                    <button class="quick-symptom" data-symptom="nausea">🤮 Nausea</button>
+                    <button class="quick-symptom" data-symptom="dizziness">😵 Dizziness</button>
+                    <button class="quick-symptom" data-symptom="skin rash">🔴 Skin Rash</button>
+                    <button class="quick-symptom" data-symptom="chest pain">💔 Chest Pain</button>
+                    <button class="quick-symptom" data-symptom="breathing difficulty">😮‍💨 Breathing</button>
+                    <button class="quick-symptom" data-symptom="joint pain">🦴 Joint Pain</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">📋 Selected Symptoms</div>
+                <div id="selectedSymptoms" style="min-height: 60px; color: var(--text-muted); font-size: 13px;">
+                    Click symptoms above or type below
+                </div>
+                <button id="analyzeQuick" style="width: 100%; margin-top: 12px; padding: 10px; background: var(--accent); border: none; border-radius: 8px; color: var(--bg-primary); font-weight: 600; cursor: pointer; font-family: inherit; display: none;">
+                    Analyze Symptoms
+                </button>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">ℹ️ Quick Info</div>
+                <div style="font-size: 12px; color: var(--text-dim); line-height: 1.6;">
+                    <p>• Describe symptoms naturally</p>
+                    <p>• Include duration (e.g., "2 days")</p>
+                    <p>• Add all relevant symptoms</p>
+                    <p>• Review specialist recommendation</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Chat Area -->
+        <section class="chat-area">
+            <!-- Progress Bar -->
+            <div class="progress-bar">
+                <div class="progress-step">
+                    <div class="step-dot active" id="step1">1</div>
+                    <span class="step-label active">Symptoms</span>
+                </div>
+                <div class="progress-step">
+                    <div class="step-dot" id="step2">2</div>
+                    <span class="step-label">Duration</span>
+                </div>
+                <div class="progress-step">
+                    <div class="step-dot" id="step3">3</div>
+                    <span class="step-label">Confirm</span>
+                </div>
+                <div class="progress-step">
+                    <div class="step-dot" id="step4">4</div>
+                    <span class="step-label">Results</span>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="messages" id="messages"></div>
+
+            <!-- Suggestions -->
+            <div class="suggestions-area" id="suggestions"></div>
+
+            <!-- Input -->
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <input type="text" id="messageInput" placeholder="Describe your symptoms..." autocomplete="off">
+                    <button class="voice-btn" id="voiceBtn" title="Voice input">🎤</button>
+                </div>
+                <button id="sendBtn">➤</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        const sessionId = 'session_' + Date.now();
+        let selectedSymptoms = [];
+        let currentStep = 1;
+        
+        const messagesEl = document.getElementById('messages');
+        const suggestionsEl = document.getElementById('suggestions');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const voiceBtn = document.getElementById('voiceBtn');
+        const selectedSymptomsEl = document.getElementById('selectedSymptoms');
+        const analyzeQuickBtn = document.getElementById('analyzeQuick');
+
+        // Initialize
+        async function init() {
+            await sendMessage('');
+            setupQuickSymptoms();
+            setupVoiceInput();
+        }
+
+        // Quick Symptoms
+        function setupQuickSymptoms() {
+            document.querySelectorAll('.quick-symptom').forEach(btn => {
+                btn.onclick = () => {
+                    const symptom = btn.dataset.symptom;
+                    if (selectedSymptoms.includes(symptom)) {
+                        selectedSymptoms = selectedSymptoms.filter(s => s !== symptom);
+                        btn.classList.remove('selected');
+                    } else {
+                        selectedSymptoms.push(symptom);
+                        btn.classList.add('selected');
+                    }
+                    updateSelectedDisplay();
+                };
+            });
+
+            analyzeQuickBtn.onclick = () => {
+                if (selectedSymptoms.length > 0) {
+                    const msg = 'I have ' + selectedSymptoms.join(', ');
+                    addMessage(msg, true);
+                    sendMessage(msg);
+                    selectedSymptoms = [];
+                    document.querySelectorAll('.quick-symptom').forEach(b => b.classList.remove('selected'));
+                    updateSelectedDisplay();
+                }
+            };
+        }
+
+        function updateSelectedDisplay() {
+            if (selectedSymptoms.length === 0) {
+                selectedSymptomsEl.innerHTML = '<span style="color: var(--text-muted)">Click symptoms above or type below</span>';
+                analyzeQuickBtn.style.display = 'none';
+            } else {
+                selectedSymptomsEl.innerHTML = selectedSymptoms.map(s => 
+                    `<span class="symptom-chip">${s}</span>`
+                ).join('');
+                analyzeQuickBtn.style.display = 'block';
+            }
+        }
+
+        // Voice Input
+        function setupVoiceInput() {
+            if (!('webkitSpeechRecognition' in window)) {
+                voiceBtn.style.display = 'none';
+                return;
+            }
+
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            let isRecording = false;
+
+            voiceBtn.onclick = () => {
+                if (isRecording) {
+                    recognition.stop();
+                    voiceBtn.classList.remove('recording');
+                    isRecording = false;
+                } else {
+                    recognition.start();
+                    voiceBtn.classList.add('recording');
+                    isRecording = true;
+                }
+            };
+
+            recognition.onresult = (event) => {
+                const text = event.results[0][0].transcript;
+                messageInput.value = text;
+                voiceBtn.classList.remove('recording');
+                isRecording = false;
+            };
+
+            recognition.onerror = () => {
+                voiceBtn.classList.remove('recording');
+                isRecording = false;
+            };
+        }
+
+        // Update progress
+        function updateProgress(state) {
+            const stateMap = {
+                'greeting': 1,
+                'collecting_symptoms': 1,
+                'asking_duration': 2,
+                'confirming_symptoms': 3,
+                'showing_results': 4
+            };
+            
+            currentStep = stateMap[state] || 1;
+            
+            for (let i = 1; i <= 4; i++) {
+                const dot = document.getElementById(`step${i}`);
+                const label = dot.nextElementSibling;
+                
+                if (i < currentStep) {
+                    dot.className = 'step-dot done';
+                    dot.textContent = '✓';
+                } else if (i === currentStep) {
+                    dot.className = 'step-dot active';
+                    dot.textContent = i;
+                    label.className = 'step-label active';
+                } else {
+                    dot.className = 'step-dot';
+                    dot.textContent = i;
+                    label.className = 'step-label';
+                }
+            }
+        }
+
+        // Add message
+        function addMessage(content, isUser = false, data = null) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = isUser ? '👤' : '🤖';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            
+            // Format content
+            let html = content
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>');
+            
+            bubble.innerHTML = html;
+            
+            // Add collected symptoms
+            if (data?.collected_symptoms?.length > 0) {
+                const symptomsDiv = document.createElement('div');
+                symptomsDiv.className = 'collected-symptoms';
+                symptomsDiv.innerHTML = `
+                    <h5>📋 Your Symptoms</h5>
+                    ${data.collected_symptoms.map(s => 
+                        `<span class="symptom-chip">${s.replace(/_/g, ' ')}</span>`
+                    ).join('')}
+                `;
+                bubble.appendChild(symptomsDiv);
+            }
+            
+            // Add predictions
+            if (data?.predictions?.length > 0) {
+                const predsDiv = document.createElement('div');
+                predsDiv.className = 'predictions-grid';
+                
+                data.predictions.forEach((pred, i) => {
+                    const card = document.createElement('div');
+                    card.className = 'prediction-card';
+                    card.innerHTML = `
+                        <div class="prediction-header">
+                            <span class="disease-name">${i + 1}. ${pred.disease}</span>
+                            <span class="confidence-badge">${pred.confidence_percent}</span>
+                        </div>
+                        <span class="severity-indicator severity-${pred.severity_level?.toLowerCase()}">${pred.severity_level}</span>
+                        ${pred.precautions?.length ? `
+                            <div class="precautions-list">💊 ${pred.precautions.slice(0, 2).join(', ')}</div>
+                        ` : ''}
+                    `;
+                    predsDiv.appendChild(card);
+                });
+                
+                bubble.appendChild(predsDiv);
+            }
+            
+            // Add specialist card
+            if (data?.recommended_specialist) {
+                const spec = data.recommended_specialist;
+                const specDiv = document.createElement('div');
+                specDiv.className = 'specialist-card';
+                specDiv.innerHTML = `
+                    <div class="specialist-header">
+                        <div class="specialist-icon">${spec.icon || '👨‍⚕️'}</div>
+                        <div>
+                            <div class="specialist-name">${spec.name}</div>
+                            <div class="specialist-desc">${spec.description}</div>
+                        </div>
+                    </div>
+                    <button class="find-specialist-btn" onclick="findSpecialist()">
+                        🔍 Find ${spec.name} Near Me
+                    </button>
+                `;
+                bubble.appendChild(specDiv);
+            }
+            
+            // Add emergency alert
+            if (data?.is_emergency) {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'emergency-box';
+                alertDiv.innerHTML = `
+                    <h4>🚨 EMERGENCY DETECTED</h4>
+                    <p>This requires immediate medical attention!</p>
+                    <p><strong>📞 Call:</strong> 1122 (Rescue) or 115 (Edhi)</p>
+                    <button class="emergency-btn" onclick="showFirstAid()">View First Aid</button>
+                `;
+                bubble.appendChild(alertDiv);
+            }
+            
+            msgDiv.appendChild(avatar);
+            msgDiv.appendChild(bubble);
+            messagesEl.appendChild(msgDiv);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        // Typing indicator
+        function showTyping() {
+            const div = document.createElement('div');
+            div.className = 'message bot';
+            div.id = 'typing';
+            div.innerHTML = `
+                <div class="avatar">🤖</div>
+                <div class="bubble">
+                    <div class="typing"><span></span><span></span><span></span></div>
+                </div>
+            `;
+            messagesEl.appendChild(div);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        function hideTyping() {
+            document.getElementById('typing')?.remove();
+        }
+
+        // Update suggestions
+        function updateSuggestions(suggestions) {
+            suggestionsEl.innerHTML = '';
+            if (suggestions?.length) {
+                suggestions.filter(s => s).forEach(s => {
+                    const chip = document.createElement('button');
+                    chip.className = 'suggestion-chip';
+                    chip.textContent = s;
+                    chip.onclick = () => {
+                        messageInput.value = s;
+                        sendUserMessage();
+                    };
+                    suggestionsEl.appendChild(chip);
+                });
+            }
+        }
+
+        // Send message
+        async function sendMessage(message) {
+            try {
+                showTyping();
+                
+                const res = await fetch(`${API_BASE}/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId, message })
+                });
+                
+                hideTyping();
+                
+                if (!res.ok) throw new Error('API error');
+                
+                const data = await res.json();
+                
+                updateProgress(data.state);
+                
+                addMessage(data.response, false, {
+                    collected_symptoms: data.collected_symptoms,
+                    predictions: data.predictions,
+                    is_emergency: data.is_emergency,
+                    recommended_specialist: data.recommended_specialist
+                });
+                
+                updateSuggestions(data.suggestions);
+                
+            } catch (err) {
+                hideTyping();
+                addMessage('⚠️ Connection error. Please make sure the API is running.', false);
+                console.error(err);
+            }
+        }
+
+        // Send user message
+        async function sendUserMessage() {
+            const msg = messageInput.value.trim();
+            if (!msg) return;
+            
+            addMessage(msg, true);
+            messageInput.value = '';
+            sendBtn.disabled = true;
+            
+            await sendMessage(msg);
+            
+            sendBtn.disabled = false;
+            messageInput.focus();
+        }
+
+        // Find specialist
+        function findSpecialist() {
+            const msg = 'Find doctor';
+            addMessage(msg, true);
+            sendMessage(msg);
+        }
+
+        // Show first aid
+        function showFirstAid() {
+            const msg = 'Show first aid';
+            addMessage(msg, true);
+            sendMessage(msg);
+        }
+
+        // Clear chat
+        function clearChat() {
+            if (confirm('Clear chat and start fresh?')) {
+                messagesEl.innerHTML = '';
+                suggestionsEl.innerHTML = '';
+                selectedSymptoms = [];
+                document.querySelectorAll('.quick-symptom').forEach(b => b.classList.remove('selected'));
+                updateSelectedDisplay();
+                // Generate new session
+                window.location.reload();
+            }
+        }
+
+        // Event listeners
+        sendBtn.onclick = sendUserMessage;
+        messageInput.onkeypress = (e) => { if (e.key === 'Enter') sendUserMessage(); };
+        document.getElementById('clearBtn').onclick = clearChat;
+
+        // Init
+        init();
+    </script>
+</body>
+</html>
