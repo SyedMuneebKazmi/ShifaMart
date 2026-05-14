@@ -1,10 +1,14 @@
 import axios from 'axios';
 import useAuthStore from '@stores/authStore';
 
-// Create axios instance with base configuration
-// Use /api for proxied requests in development, or full URL in production
+// In development Vite proxies /api → http://localhost:5000
+// In production (Docker/Coolify) set VITE_API_URL to the backend origin, e.g. https://api.yourdomain.com
+const baseURL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api';
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -20,33 +24,23 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Response interceptor - Handle errors globally
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    // Handle 401 Unauthorized - logout user
     if (error.response?.status === 401) {
       useAuthStore.getState().logout();
       window.location.href = '/login';
     }
-    
-    // Handle 403 Forbidden
     if (error.response?.status === 403) {
       console.error('Access forbidden:', error.response.data);
     }
-    
-    // Handle network errors
     if (!error.response) {
       console.error('Network error:', error.message);
     }
-    
     return Promise.reject(error);
   }
 );
