@@ -13,8 +13,8 @@ RUN npm ci --omit=dev --frozen-lockfile
 # Copy application source
 COPY . .
 
-# Create uploads directory (persisted via volume in production)
-RUN mkdir -p uploads
+# Writable upload dirs for non-root runtime (USER node cannot mkdir under root-owned uploads)
+RUN mkdir -p uploads/avatars && chown -R node:node uploads
 
 # Drop root privileges
 USER node

@@ -4,11 +4,36 @@ Configuration settings for ShifaMart+ AI Agent
 import os
 from pathlib import Path
 
-# Base paths
-BASE_DIR = Path(__file__).parent.parent
+_PACKAGE_DIR = Path(__file__).resolve().parent
+
+
+def _resolve_data_dir() -> Path:
+    """
+    Directory containing dataset CSVs.
+
+    Resolution order:
+    1) AI_AGENT_DATA_DIR env (absolute or relative path)
+    2) Same folder as this package (typical Docker layout: CSVs copied into /app)
+    3) Parent folder (monorepo checkout: CSVs next to fyp_shifamart_ai_agent/)
+    4) Package dir as fallback
+    """
+    override = os.environ.get("AI_AGENT_DATA_DIR", "").strip()
+    if override:
+        return Path(override).expanduser().resolve()
+    if (_PACKAGE_DIR / "dataset.csv").exists() or (_PACKAGE_DIR / "combined_dataset.csv").exists():
+        return _PACKAGE_DIR
+    parent = _PACKAGE_DIR.parent
+    if (parent / "dataset.csv").exists() or (parent / "combined_dataset.csv").exists():
+        return parent
+    return _PACKAGE_DIR
+
+
+# CSV / auxiliary data (descriptions, precautions, severity weights)
+BASE_DIR = _resolve_data_dir()
 DATA_DIR = BASE_DIR
-MODEL_DIR = Path(__file__).parent / "models"
-MODEL_DIR.mkdir(exist_ok=True)
+# Saved joblibs always live next to the Python package (e.g. /app/models in Docker)
+MODEL_DIR = _PACKAGE_DIR / "models"
+MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
 # Dataset paths
 ORIGINAL_DATASET_PATH = DATA_DIR / "dataset.csv"

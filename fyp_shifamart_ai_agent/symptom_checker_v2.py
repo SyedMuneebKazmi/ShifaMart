@@ -97,7 +97,7 @@ class EnhancedSymptomChecker:
             # Load severity model
             try:
                 self.severity_model.load()
-            except:
+            except Exception:
                 print("Severity model not found, training new one...")
                 self.severity_model.load_symptom_weights()
                 self.severity_model.train(self.model.get_all_symptoms())
