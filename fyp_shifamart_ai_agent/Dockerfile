@@ -1,7 +1,19 @@
-# ─── ShifaMart+ AI Agent (Python / FastAPI) ──────────────────────────────────
+# ShifaMart+ AI Agent — FastAPI service
+#
+# BUILD CONTEXT: this directory (`fyp_shifamart_ai_agent/`) — matches Coolify when the service
+# uses this folder as base directory (default).
+#   docker build -t shifamart-ai .
+#
+# Required in this folder for the image: dataset.csv, symptom_Description.csv, symptom_precaution.csv,
+# Symptom-severity.csv (optional: combined_dataset.csv for the expanded dataset).
+#
+# Optional env:
+#   SKIP_AUTO_TRAIN=1  — fail if models/ is empty instead of training on first boot
+#   AI_AGENT_DATA_DIR  — override directory for CSV datasets
+#   PORT               — API port (default 8000), read by mern_api.py
+
 FROM python:3.11-slim
 
-# System deps needed by spaCy / scikit-learn / LightGBM
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
@@ -11,10 +23,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# ── Install Python dependencies ──────────────────────────────────────────────
-COPY requirements.txt .
+COPY requirements.txt ./
 
-# Install a trimmed set of dependencies (skip dev/notebook-only packages)
 RUN pip install --no-cache-dir \
     pandas \
     numpy \
@@ -29,31 +39,17 @@ RUN pip install --no-cache-dir \
     joblib \
     python-dotenv
 
-# Download the spaCy English model (small, ~12 MB)
 RUN python -m spacy download en_core_web_sm
 
-# Download required NLTK data
 RUN python -c "import nltk; nltk.download('punkt', quiet=True); nltk.download('stopwords', quiet=True); nltk.download('wordnet', quiet=True); nltk.download('punkt_tab', quiet=True)"
 
-# ── Copy application source ───────────────────────────────────────────────────
 COPY . .
-
-# ── Pre-trained model files are expected to be in ./models/ ──────────────────
-# They are either baked into the image (copy from local ./models)
-# or mounted as a volume at runtime (see docker-compose.yml).
-# To bake them in, uncomment:
-# COPY models/ ./models/
-
-# ── Data CSV files (read-only) ────────────────────────────────────────────────
-# These large CSVs live in the parent repo directory.
-# In Docker we expect them to be mounted as a volume (see docker-compose.yml).
-# Alternatively, copy the ones you need:
-# COPY dataset.csv combined_dataset.csv symptom_Description.csv symptom_precaution.csv Symptom-severity.csv ./
+RUN chmod +x /app/docker-entrypoint.sh
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=60s --timeout=10s --start-period=120s --retries=3 \
-  CMD wget -qO- http://localhost:8000/api/health || exit 1
+HEALTHCHECK --interval=60s --timeout=10s --start-period=300s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:8000/api/health || exit 1
 
-# Run the FastAPI server
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 CMD ["python", "mern_api.py"]

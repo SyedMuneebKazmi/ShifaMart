@@ -13,16 +13,16 @@ RUN npm ci --omit=dev --frozen-lockfile
 # Copy application source
 COPY . .
 
-# Create uploads directory (persisted via volume in production)
-RUN mkdir -p uploads
+# Writable upload dirs for non-root runtime (USER node cannot mkdir under root-owned uploads)
+RUN mkdir -p uploads/avatars && chown -R node:node uploads
 
 # Drop root privileges
 USER node
 
 EXPOSE 5000
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD wget -qO- http://localhost:5000/api/health || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=5 \
+  CMD wget -qO- http://127.0.0.1:5000/api/health >/dev/null || exit 1
 
 # Use dumb-init so SIGTERM is forwarded correctly to Node
 ENTRYPOINT ["dumb-init", "--"]

@@ -1,6 +1,8 @@
 /**
  * Shared MongoDB connect for Atlas: applies DNS_SERVERS from .env, optional MONGODB_URI_FALLBACK
  * when SRV lookups fail (common on restricted networks).
+ *
+ * Connection string: set MONGODB_URI, or MongoDB_URI (docker-compose / legacy), or mongodb_uri.
  */
 const dns = require('dns');
 const mongoose = require('mongoose');
@@ -24,12 +26,23 @@ function isSrvDnsFailure(err) {
   );
 }
 
+function resolveMongoUri() {
+  return (
+    process.env.MONGODB_URI ||
+    process.env.MongoDB_URI ||
+    process.env.mongodb_uri ||
+    ''
+  ).trim();
+}
+
 async function connectMongoose(options = {}) {
   applyMongoDnsFromEnv();
-  const primary = process.env.MONGODB_URI;
+  const primary = resolveMongoUri();
   const fallback = process.env.MONGODB_URI_FALLBACK;
   if (!primary) {
-    throw new Error('MONGODB_URI is not set');
+    throw new Error(
+      'MongoDB URI is not set. Define MONGODB_URI (or MongoDB_URI) in Coolify / Docker env — not only in a local .env file.'
+    );
   }
   try {
     return await mongoose.connect(primary, options);

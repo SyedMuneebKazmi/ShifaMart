@@ -34,7 +34,8 @@ RUN rm -f /usr/share/nginx/html/mockServiceWorker.js
 
 EXPOSE 80
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget -qO- http://localhost/ || exit 1
+# Use 127.0.0.1: busybox wget often resolves "localhost" to ::1 first; `listen 80` can be IPv4-only → connection refused.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=5 \
+  CMD wget -qO- http://127.0.0.1/ >/dev/null || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]
