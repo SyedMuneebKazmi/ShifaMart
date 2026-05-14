@@ -1,0 +1,119 @@
+\chapter{Literature Review}
+
+\section{Introduction}
+This chapter reviews existing research and systems related to AI-based healthcare, disease prediction, symptom analysis, and medical assistance systems. The review covers machine learning approaches, natural language processing in healthcare, and related work in the domain.
+
+\section{AI in Healthcare}
+Artificial Intelligence has revolutionized healthcare by enabling automated diagnosis, treatment recommendations, and patient monitoring. Machine learning algorithms have shown remarkable success in medical image analysis, drug discovery, and clinical decision support systems \cite{topol2019high}.
+
+\subsection{Machine Learning for Disease Prediction}
+Machine learning techniques have been extensively applied to disease prediction tasks. Various algorithms including Support Vector Machines (SVM), Random Forest, Neural Networks, and ensemble methods have been used for classification problems in healthcare \cite{rajkomar2018machine}.
+
+\subsubsection{Ensemble Methods}
+Ensemble methods, which combine multiple models, have shown superior performance in medical diagnosis tasks. Studies have demonstrated that combining XGBoost and Random Forest classifiers can achieve higher accuracy than individual models \cite{chen2016xgboost}.
+
+\subsubsection{Feature Engineering}
+Effective feature engineering is crucial for symptom-based disease prediction. Binary encoding of symptoms, handling missing values, and feature selection techniques significantly impact model performance \cite{guo2016calibration}.
+
+\section{Symptom-Based Disease Prediction}
+Symptom-based disease prediction systems analyze patient-reported symptoms to suggest possible conditions. These systems face challenges including:
+
+\begin{itemize}
+    \item High dimensionality of symptom space
+    \item Imbalanced datasets (some diseases are more common than others)
+    \item Variability in symptom presentation
+    \item Need for interpretable predictions
+\end{itemize}
+
+\subsection{Related Systems}
+Several systems have been developed for symptom-based diagnosis:
+
+\subsubsection{WebMD Symptom Checker}
+WebMD provides a symptom checker that allows users to input symptoms and receive possible condition suggestions. However, it relies primarily on rule-based matching rather than machine learning \cite{webmd}.
+
+\subsubsection{IBM Watson for Oncology}
+IBM Watson uses natural language processing and machine learning to assist oncologists in treatment decisions. While more advanced, it focuses on specific medical domains \cite{ibmwatson}.
+
+\subsubsection{Ada Health}
+Ada Health is a mobile health application that uses AI to assess symptoms and provide health information. It employs a probabilistic reasoning engine for symptom analysis \cite{adahealth}.
+
+\section{Natural Language Processing in Healthcare}
+NLP techniques enable systems to understand and extract information from unstructured medical text. Key applications include:
+
+\begin{itemize}
+    \item Symptom extraction from patient descriptions
+    \item Medical entity recognition
+    \item Clinical note analysis
+    \item Patient-doctor conversation understanding
+\end{itemize}
+
+\subsection{Symptom Extraction}
+Extracting symptoms from natural language requires:
+\begin{enumerate}
+    \item Synonym mapping and normalization
+    \item Negation detection
+    \item Severity modifier identification
+    \item Temporal information extraction (duration)
+\end{enumerate}
+
+Studies have shown that rule-based approaches combined with machine learning can effectively extract medical entities from text \cite{wang2018clinical}.
+
+\section{Severity Detection and Emergency Recognition}
+Identifying medical emergencies is critical for patient safety. Severity detection systems typically use:
+
+\begin{itemize}
+    \item Rule-based scoring using symptom weights
+    \item Machine learning classifiers for severity levels
+    \item Pattern matching for dangerous symptom combinations
+    \item Temporal factors (duration of symptoms)
+\end{itemize}
+
+Research has shown that combining rule-based and ML approaches provides better accuracy for severity assessment \cite{liu2019emergency}.
+
+\section{First Aid and Medical Guidance Systems}
+Digital first-aid systems provide step-by-step guidance for medical emergencies. These systems must:
+
+\begin{itemize}
+    \item Cover common emergency scenarios
+    \item Provide clear, actionable instructions
+    \item Include safety warnings and contraindications
+    \item Emphasize when to seek professional medical help
+\end{itemize}
+
+\section{Conversational AI in Healthcare}
+Chatbot systems for healthcare have gained popularity for providing accessible medical information. Key requirements include:
+
+\begin{itemize}
+    \item Natural language understanding
+    \item Context management across conversation turns
+    \item Appropriate medical disclaimers
+    \item Emergency detection and escalation
+\end{itemize}
+
+Studies indicate that conversational interfaces can improve healthcare accessibility, though they must be carefully designed to avoid providing medical advice inappropriately \cite{ni2019chatbot}.
+
+\section{API Design for Healthcare Systems}
+RESTful APIs are commonly used for healthcare system integration. Key considerations include:
+
+\begin{itemize}
+    \item Security and privacy (HIPAA compliance considerations)
+    \item Response time and scalability
+    \item Error handling and validation
+    \item Comprehensive documentation
+\end{itemize}
+
+FastAPI has emerged as a popular framework for building healthcare APIs due to its performance and automatic documentation generation \cite{fastapi}.
+
+\section{Research Gaps}
+While significant progress has been made, several gaps remain:
+
+\begin{enumerate}
+    \item Limited integration of multiple AI components (NLP, ML, severity detection) in a single system
+    \item Need for better handling of symptom duration and temporal factors
+    \item Lack of comprehensive first-aid guidance integrated with symptom analysis
+    \item Limited research on specialist recommendation based on predicted diseases
+    \item Need for better explainability in disease prediction models
+\end{enumerate}
+
+\section{Summary}
+This literature review highlights the potential of AI in healthcare, particularly for symptom-based disease prediction. The combination of machine learning, natural language processing, and rule-based systems can create comprehensive healthcare assistance platforms. Our project addresses several research gaps by integrating multiple AI components into a unified system that provides disease prediction, severity assessment, first-aid guidance, and specialist recommendations.

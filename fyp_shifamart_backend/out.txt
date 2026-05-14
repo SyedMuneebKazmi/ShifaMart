@@ -1,0 +1,1 @@
+{"success":false,"message":"AI API is unavailable","error":"Request failed with status code 404","timestamp":"2026-04-04T17:19:29.581Z"}

@@ -1,0 +1,95 @@
+\documentclass{fast-nuces-bs}
+
+%\documentclass{article}
+
+\usepackage{blindtext}
+\usepackage{mathptmx}% Times Roman font
+\usepackage[T1]{fontenc}
+\usepackage{lipsum} 
+\usepackage{sectsty}
+\usepackage{tikz-uml}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+% Code listing configuration
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{red},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    stepnumber=1,
+    numbersep=5pt,
+    backgroundcolor=\color{gray!10},
+    frame=single,
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=4,
+    showstringspaces=false
+}
+
+% Information about the Thesis 
+% -----------------------------------------------------------------------------
+% (All are compulsory, do not delete any line other than author Information)
+% For e.g., usually there are 3 students in a group, so leave authorone, 
+% authortwo, and authorthree, and delete authorfour.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\department{Department of Computer Science}
+\faculty{Computer Science}
+\degreeyear{2024}
+\degreemonth{June}
+\degreename{Computer Science}
+\campuscity{Islamabad}
+
+\authorone{Student 1}{19I-1234}
+\authortwo{Student 2}{19I-1234}
+\authorthree{Student 3}{19I-1234}
+
+\supervisor{Mr./ Ms./ Dr. Supervisor Name}
+\sessionduration{2020-2024}
+\cosupervisor{Mr./ Ms./ Dr. Supervisor Name}
+\deanname{Dr. Dean Computing}
+\directorname{Dr. Director of the Campus}
+\hodname{Dr. Head of Computer Science Department}
+\fypcoordinatorname{Name of FYP Coordinator}
+
+\title{ShifaMart+ AI Agent: An Intelligent Healthcare System for Disease Prediction, Symptom Analysis, and Medical Assistance}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Former document starts below this
+
+\begin{document}
+
+\begin{acknowledgements}
+We would like to express our sincere gratitude to our supervisor for their invaluable guidance, support, and encouragement throughout this project. We are also thankful to FAST-NUCES for providing us with the resources and environment necessary to complete this research work. Special thanks to the open-source community for providing excellent tools and libraries that made this project possible.
+\end{acknowledgements}
+
+\begin{abstract}
+This project presents ShifaMart+ AI Agent, an intelligent healthcare system that leverages machine learning and natural language processing to provide disease prediction, symptom analysis, and medical assistance. The system employs an ensemble of XGBoost and Random Forest classifiers to predict diseases from symptoms with an accuracy of 92-96\%. It features advanced NLP capabilities for extracting symptoms from natural language, a dedicated severity detection model, comprehensive first-aid guidance, and specialist recommendations. The system is implemented as a RESTful API using FastAPI, enabling integration with web and mobile applications. The conversational AI agent provides an intuitive interface for users to describe their symptoms in natural language and receive immediate medical guidance. The system addresses critical healthcare challenges by making medical information more accessible and providing preliminary health assessments, while maintaining appropriate disclaimers about the informational nature of the system.
+\end{abstract}
+
+\include{sections/chapter1}
+\include{sections/chapter2}
+\include{sections/chapter3}
+\include{sections/chapter4}
+
+\bibliographystyle{plain}
+\bibliography{bib}
+\addcontentsline{toc}{chapter}{References} 
+
+\appendix
+\include{appendix}
+
+\end{document}

@@ -1,0 +1,351 @@
+\chapter{Appendix}
+
+\section{API Documentation}
+\subsection{Complete API Endpoints}
+
+\subsubsection{Health Check}
+\begin{lstlisting}[language=bash, caption=Health Check Endpoint]
+GET /health
+
+Response:
+{
+    "status": "healthy",
+    "version": "2.0.0",
+    "model_loaded": true,
+    "symptoms_count": 132,
+    "diseases_count": 41,
+    "features": [
+        "Disease Prediction",
+        "NLP Symptom Extraction",
+        "Severity Detection",
+        "First Aid Guidance",
+        "Conversational AI Agent"
+    ]
+}
+\end{lstlisting}
+
+\subsubsection{Predict from Symptoms}
+\begin{lstlisting}[language=bash, caption=Predict from Symptoms]
+POST /predict/symptoms
+Content-Type: application/json
+
+Request Body:
+{
+    "symptoms": ["fever", "headache", "fatigue"],
+    "top_k": 5,
+    "duration": "3 days"
+}
+
+Response:
+{
+    "predictions": [
+        {
+            "disease": "Common Cold",
+            "probability": 0.85,
+            "confidence_percent": "85.0%",
+            "description": "Viral infection...",
+            "precautions": ["rest", "hydration"],
+            "severity_score": 2.5,
+            "severity_level": "MILD"
+        }
+    ],
+    "matched_symptoms": ["high_fever", "headache", "fatigue"],
+    "severity": {
+        "level": "MILD",
+        "score": 2.5,
+        "confidence": 0.8,
+        "reason": "Mild symptoms...",
+        "is_emergency": false
+    },
+    "recommended_specialist": {
+        "key": "general_practitioner",
+        "name": "General Practitioner",
+        "description": "...",
+        "icon": "👨‍⚕️"
+    }
+}
+\end{lstlisting}
+
+\subsubsection{Predict from Text}
+\begin{lstlisting}[language=bash, caption=Predict from Natural Language Text]
+POST /predict/text
+Content-Type: application/json
+
+Request Body:
+{
+    "text": "I have had fever and headache for 2 days",
+    "top_k": 5
+}
+
+Response: (Same structure as /predict/symptoms)
+\end{lstlisting}
+
+\subsubsection{Chat Endpoint}
+\begin{lstlisting}[language=bash, caption=Conversational Agent]
+POST /chat
+Content-Type: application/json
+
+Request Body:
+{
+    "session_id": "user123",
+    "message": "I have fever and body pain"
+}
+
+Response:
+{
+    "response": "I've noted: Fever, Body Pain...",
+    "state": "collecting_symptoms",
+    "suggestions": ["I also have chills", "That's all"],
+    "collected_symptoms": ["high_fever", "muscle_pain"],
+    "predictions": null,
+    "severity": null,
+    "is_emergency": false
+}
+\end{lstlisting}
+
+\section{System Configuration}
+\subsection{Configuration File}
+\begin{lstlisting}[language=Python, caption=System Configuration]
+# Model Configuration
+MODEL_DIR = Path("models")
+RANDOM_STATE = 42
+TEST_SIZE = 0.2
+TOP_K_DISEASES = 5
+
+# Dataset Paths
+DATASET_PATH = "dataset.csv"
+SYMPTOM_DESCRIPTION_PATH = "symptom_Description.csv"
+SYMPTOM_PRECAUTION_PATH = "symptom_precaution.csv"
+SYMPTOM_SEVERITY_PATH = "Symptom-severity.csv"
+
+# API Configuration
+API_HOST = "0.0.0.0"
+API_PORT = 8000
+
+# Severity Thresholds
+SEVERITY_THRESHOLDS = {
+    "MILD": 0.0,
+    "MODERATE": 3.0,
+    "SEVERE": 5.0,
+    "EMERGENCY": 7.0
+}
+\end{lstlisting}
+
+\section{Model Training Script}
+\subsection{Training Code Example}
+\begin{lstlisting}[language=Python, caption=Model Training Script]
+from disease_predictor import DiseasePredictionModel
+
+# Initialize model
+model = DiseasePredictionModel()
+
+# Load and preprocess data
+df = model.preprocessor.load_main_dataset()
+model.preprocessor.load_auxiliary_data()
+X, y = model.preprocessor.prepare_training_data(df)
+
+# Train model
+model.train(X, y, use_ensemble=True)
+
+# Save model
+model.save()
+
+# Test prediction
+test_symptoms = ['fever', 'headache', 'fatigue']
+predictions = model.predict(test_symptoms, top_k=3)
+print(predictions)
+\end{lstlisting}
+
+\section{Dataset Statistics}
+\subsection{Dataset Overview}
+\begin{table}[H]
+\centering
+\caption{Dataset Statistics}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Statistic} & \textbf{Value} \\
+\hline
+Total Records & 4,922 \\
+\hline
+Number of Diseases & 41 \\
+\hline
+Number of Symptoms & 132 \\
+\hline
+Average Symptoms per Disease & 5-8 \\
+\hline
+Most Common Disease & Common Cold \\
+\hline
+Dataset Format & CSV \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Supported Diseases}
+The system supports prediction for the following 41 diseases:
+
+\begin{itemize}
+    \item Common Cold, Typhoid, Malaria, Dengue
+    \item Diabetes, Hypertension, Heart Attack
+    \item Gastroenteritis, Peptic Ulcer, GERD
+    \item Migraine, Tension Headache, Cervical Spondylosis
+    \item Arthritis, Osteoarthritis
+    \item Fungal Infection, Allergy, Acne
+    \item Urinary Tract Infection, Chronic Kidney Disease
+    \item Jaundice, Hepatitis
+    \item Pneumonia, Bronchial Asthma
+    \item And 20+ other conditions
+\end{itemize}
+
+\section{Supported Symptoms}
+The system recognizes 132 symptoms including:
+
+\begin{itemize}
+    \item Fever-related: high\_fever, mild\_fever, chills, sweating
+    \item Pain-related: headache, stomach\_pain, chest\_pain, joint\_pain, muscle\_pain
+    \item Respiratory: cough, breathlessness, phlegm, runny\_nose
+    \item Digestive: nausea, vomiting, diarrhoea, constipation, acidity
+    \item Skin: itching, skin\_rash, yellowish\_skin
+    \item Neurological: dizziness, blurred\_vision, anxiety
+    \item And 100+ other symptoms
+\end{itemize}
+
+\section{Emergency Contact Numbers}
+The system includes the following emergency contact numbers for Pakistan:
+
+\begin{table}[H]
+\centering
+\caption{Emergency Contact Numbers}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Service} & \textbf{Number} \\
+\hline
+Rescue (Ambulance) & 1122 \\
+\hline
+Edhi Foundation & 115 \\
+\hline
+Police & 15 \\
+\hline
+Fire Department & 16 \\
+\hline
+Aman Foundation & 1021 \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Installation Instructions}
+\subsection{Prerequisites}
+\begin{enumerate}
+    \item Python 3.8 or higher
+    \item pip package manager
+    \item 2GB+ RAM
+    \item 1GB+ disk space
+\end{enumerate}
+
+\subsection{Installation Steps}
+\begin{lstlisting}[language=bash, caption=Installation Commands]
+# Clone repository
+git clone <repository-url>
+cd fyp/ai_agent
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Train models (first time only)
+python train_improved.py
+
+# Start API server
+python api_v2.py
+\end{lstlisting}
+
+\section{Project Structure}
+\begin{lstlisting}[language=bash, caption=Project Directory Structure]
+ai_agent/
+├── api_v2.py              # FastAPI REST endpoints
+├── config.py              # Configuration settings
+├── data_preprocessing.py  # Data loading and preprocessing
+├── disease_predictor.py   # ML model training and prediction
+├── symptom_checker_v2.py  # Conversational AI agent
+├── nlp_processor.py       # NLP for symptom extraction
+├── severity_model.py      # Severity detection model
+├── first_aid.py           # First aid guidance system
+├── specialist_mapper.py   # Specialist recommendations
+├── maps_integration.py    # Location-based doctor search
+├── prediction_validator.py # Prediction validation
+├── duration_analyzer.py    # Duration-based analysis
+├── models/                # Saved ML models
+│   ├── ensemble_model.joblib
+│   ├── rf_model.joblib
+│   ├── xgb_model.joblib
+│   ├── preprocessor.joblib
+│   └── severity_model.joblib
+├── web/                   # Web interface
+│   └── index.html
+└── requirements.txt       # Python dependencies
+\end{lstlisting}
+
+\section{Testing}
+\subsection{Unit Tests}
+The system includes comprehensive unit tests for:
+\begin{itemize}
+    \item Symptom extraction from text
+    \item Disease prediction accuracy
+    \item Severity detection
+    \item First aid guide retrieval
+    \item API endpoint functionality
+\end{itemize}
+
+\subsection{Running Tests}
+\begin{lstlisting}[language=bash, caption=Test Execution]
+# Run comprehensive tests
+python test_comprehensive.py
+
+# Test specific components
+python -m pytest tests/
+\end{lstlisting}
+
+\section{Performance Benchmarks}
+\subsection{Model Inference Times}
+\begin{table}[H]
+\centering
+\caption{Inference Performance}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Operation} & \textbf{Time (ms)} \\
+\hline
+Single Prediction & 50-100 \\
+\hline
+Top-5 Predictions & 80-150 \\
+\hline
+NLP Symptom Extraction & 20-50 \\
+\hline
+Severity Assessment & 30-60 \\
+\hline
+First Aid Lookup & 10-30 \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Error Codes}
+The API uses standard HTTP status codes:
+\begin{itemize}
+    \item 200: Success
+    \item 400: Bad Request (invalid input)
+    \item 404: Not Found (resource not available)
+    \item 500: Internal Server Error
+    \item 503: Service Unavailable (model not loaded)
+\end{itemize}
+
+\section{License and Disclaimer}
+\subsection{License}
+This project is developed for academic purposes as part of Final Year Project at FAST-NUCES.
+
+\subsection{Medical Disclaimer}
+\textbf{IMPORTANT}: This system is for informational purposes only and does not provide medical advice, diagnosis, or treatment. Always consult qualified healthcare professionals for medical concerns. The system should not be used as a substitute for professional medical care, especially in emergency situations.
+
+\section{Contact Information}
+For questions or issues regarding this project:
+\begin{itemize}
+    \item Project Repository: [GitHub URL]
+    \item Email: [Contact Email]
+    \item Institution: FAST-NUCES, Islamabad
+\end{itemize}

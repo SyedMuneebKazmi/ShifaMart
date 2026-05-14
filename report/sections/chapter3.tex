@@ -1,0 +1,358 @@
+\chapter{System Design and Implementation}
+
+\section{System Architecture}
+The ShifaMart+ AI Agent follows a modular architecture with clear separation of concerns. The system consists of several interconnected components that work together to provide comprehensive healthcare assistance.
+
+\subsection{High-Level Architecture}
+The system architecture is divided into the following layers:
+
+\begin{enumerate}
+    \item \textbf{Presentation Layer}: Web interface and API endpoints
+    \item \textbf{Application Layer}: Business logic and orchestration
+    \item \textbf{AI/ML Layer}: Machine learning models and NLP processors
+    \item \textbf{Data Layer}: Data preprocessing and model storage
+\end{enumerate}
+
+\subsection{Component Diagram}
+The main components of the system include:
+
+\begin{itemize}
+    \item \textbf{Disease Prediction Model}: Ensemble of XGBoost and Random Forest classifiers
+    \item \textbf{NLP Processor}: Natural language understanding for symptom extraction
+    \item \textbf{Severity Detection Model}: Gradient Boosting classifier for severity assessment
+    \item \textbf{First Aid System}: Rule-based first-aid guidance system
+    \item \textbf{Conversational Agent}: State machine-based chat interface
+    \item \textbf{Specialist Mapper}: Disease-to-specialist recommendation system
+    \item \textbf{Maps Integration}: Location-based doctor search
+    \item \textbf{API Server}: FastAPI-based RESTful API
+\end{itemize}
+
+\section{Data Preprocessing}
+The data preprocessing module handles loading and transformation of medical datasets.
+
+\subsection{Dataset Structure}
+The system uses four main datasets:
+
+\begin{enumerate}
+    \item \textbf{Main Dataset} (\texttt{dataset.csv}): Contains 4,922 symptom-disease mappings
+    \item \textbf{Symptom Description} (\texttt{symptom\_Description.csv}): Disease descriptions
+    \item \textbf{Symptom Precaution} (\texttt{symptom\_precaution.csv}): Precautions for each disease
+    \item \textbf{Symptom Severity} (\texttt{Symptom-severity.csv}): Severity weights for symptoms
+\end{enumerate}
+
+\subsection{Preprocessing Steps}
+The preprocessing pipeline includes:
+
+\begin{enumerate}
+    \item \textbf{Data Loading}: Reading CSV files and handling missing values
+    \item \textbf{Symptom Normalization}: Converting symptom names to standardized format
+    \item \textbf{Feature Encoding}: Creating binary feature vectors from symptoms
+    \item \textbf{Label Encoding}: Encoding disease names to numeric labels
+    \item \textbf{Data Splitting}: Training/validation/test set division
+\end{enumerate}
+
+\section{Disease Prediction Model}
+The disease prediction model uses an ensemble approach combining XGBoost and Random Forest classifiers.
+
+\subsection{Model Architecture}
+The ensemble model consists of:
+
+\begin{itemize}
+    \item \textbf{Random Forest Classifier}:
+    \begin{itemize}
+        \item 100 estimators
+        \item Maximum depth: 15
+        \item Minimum samples split: 5
+        \item Class weight: balanced
+    \end{itemize}
+    
+    \item \textbf{XGBoost Classifier}:
+    \begin{itemize}
+        \item 100 estimators
+        \item Maximum depth: 6
+        \item Learning rate: 0.1
+        \item Objective: multi:softprob
+        \item Tree method: hist (memory efficient)
+    \end{itemize}
+    
+    \item \textbf{Voting Classifier}: Soft voting using probability distributions
+\end{itemize}
+
+\subsection{Training Process}
+The training process includes:
+
+\begin{enumerate}
+    \item Data preprocessing and feature extraction
+    \item Train-test split (80-20) with stratification
+    \item Individual model training
+    \item Ensemble model creation and training
+    \item Model evaluation using accuracy and classification report
+    \item Model persistence using joblib
+\end{enumerate}
+
+\subsection{Rule-Based Enhancements}
+To improve prediction accuracy, the system includes rule-based corrections:
+
+\begin{itemize}
+    \item \textbf{Symptom-Disease Pattern Boosting}: Increases probability for common symptom-disease combinations
+    \item \textbf{Serious Disease Filtering}: Reduces probability of serious diseases when only generic symptoms are present
+    \item \textbf{Duration-Based Adjustments}: Considers symptom duration for better predictions
+\end{itemize}
+
+\section{Natural Language Processing}
+The NLP processor extracts symptoms from natural language descriptions.
+
+\subsection{Processing Pipeline}
+The NLP pipeline includes:
+
+\begin{enumerate}
+    \item \textbf{Text Preprocessing}:
+    \begin{itemize}
+        \item Lowercase conversion
+        \item Contraction expansion
+        \item Punctuation normalization
+        \item Whitespace normalization
+    \end{itemize}
+    
+    \item \textbf{Symptom Extraction}:
+    \begin{itemize}
+        \item Synonym matching (132+ symptom synonyms)
+        \item Direct symptom matching
+        \item Fuzzy matching for common symptom words
+    \end{itemize}
+    
+    \item \textbf{Metadata Extraction}:
+    \begin{itemize}
+        \item Duration extraction (days, weeks, hours, months)
+        \item Severity modifier detection (mild, moderate, severe)
+        \item Negation detection
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Synonym Mapping}
+The system maintains a comprehensive synonym dictionary mapping natural language phrases to standardized symptom names. For example:
+
+\begin{itemize}
+    \item "fever", "high temperature", "pyrexia" $\rightarrow$ \texttt{high\_fever}
+    \item "stomach pain", "tummy ache", "abdominal pain" $\rightarrow$ \texttt{stomach\_pain}
+    \item "shortness of breath", "difficulty breathing" $\rightarrow$ \texttt{breathlessness}
+\end{itemize}
+
+\section{Severity Detection Model}
+The severity detection model classifies symptoms into four severity levels.
+
+\subsection{Severity Levels}
+\begin{enumerate}
+    \item \textbf{MILD}: Low-risk symptoms requiring home care
+    \item \textbf{MODERATE}: Symptoms that should be monitored
+    \item \textbf{SEVERE}: Symptoms requiring medical attention
+    \item \textbf{EMERGENCY}: Critical symptoms requiring immediate care
+\end{enumerate}
+
+\subsection{Model Approach}
+The severity model uses a hybrid approach:
+
+\begin{itemize}
+    \item \textbf{Rule-Based Component}:
+    \begin{itemize}
+        \item Symptom weight scoring
+        \item Dangerous combination detection
+        \item Duration-based severity adjustment
+    \end{itemize}
+    
+    \item \textbf{ML Component}:
+    \begin{itemize}
+        \item Gradient Boosting Classifier
+        \item Synthetic training data generation
+        \item Confidence-based prediction
+    \end{itemize}
+\end{itemize}
+
+\subsection{Emergency Detection}
+The system identifies emergencies through:
+
+\begin{itemize}
+    \item Critical symptom detection (chest pain, breathlessness, coma, etc.)
+    \item Dangerous symptom combinations (e.g., chest pain + breathlessness = heart attack)
+    \item High severity scores from weighted symptom analysis
+\end{itemize}
+
+\section{First Aid System}
+The first aid system provides step-by-step guidance for medical emergencies.
+
+\subsection{Emergency Types Covered}
+The system covers 12+ emergency types including:
+
+\begin{itemize}
+    \item Heart attack
+    \item Stroke
+    \item Breathing difficulty
+    \item Choking
+    \item Severe bleeding
+    \item Burns
+    \item Seizures
+    \item Unconsciousness
+    \item Anaphylaxis
+    \item Poisoning
+    \item High fever emergency
+    \item Severe dehydration
+\end{itemize}
+
+\subsection{First Aid Guide Structure}
+Each first aid guide includes:
+
+\begin{itemize}
+    \item Title and description
+    \item Emergency contact numbers
+    \item Step-by-step instructions
+    \item Warnings and contraindications
+    \item "Do NOT" guidelines
+    \item When to call emergency services
+    \item Additional notes
+\end{itemize}
+
+\section{Conversational AI Agent}
+The conversational agent provides an intuitive interface for symptom collection and analysis.
+
+\subsection{State Machine Design}
+The agent uses a state machine with the following states:
+
+\begin{enumerate}
+    \item \textbf{GREETING}: Initial welcome and instructions
+    \item \textbf{COLLECTING\_SYMPTOMS}: Active symptom collection
+    \item \textbf{ASKING\_DURATION}: Duration inquiry
+    \item \textbf{CONFIRMING\_SYMPTOMS}: Symptom confirmation
+    \item \textbf{SHOWING\_RESULTS}: Displaying predictions and recommendations
+    \item \textbf{EMERGENCY\_DETECTED}: Emergency response mode
+    \item \textbf{ASKING\_CITY}: Location input for doctor search
+    \item \textbf{ENDED}: Session termination
+\end{enumerate}
+
+\subsection{Session Management}
+Each user session maintains:
+
+\begin{itemize}
+    \item Collected symptoms
+    \item Symptom duration
+    \item Disease predictions
+    \item Severity assessment
+    \item Conversation history
+    \item User location (if provided)
+\end{itemize}
+
+\section{Specialist Recommendation}
+The system recommends appropriate medical specialists based on predicted diseases.
+
+\subsection{Specialist Mapping}
+The system maps diseases to specialists including:
+
+\begin{itemize}
+    \item Cardiologist (heart conditions)
+    \item Neurologist (neurological conditions)
+    \item Dermatologist (skin conditions)
+    \item Gastroenterologist (digestive conditions)
+    \item Pulmonologist (respiratory conditions)
+    \item And 10+ other specialties
+\end{itemize}
+
+\subsection{Recommendation Logic}
+Specialist recommendation uses:
+
+\begin{enumerate}
+    \item Primary: Disease-based mapping (most accurate)
+    \item Fallback: Symptom-based mapping
+    \item Integration with location services for finding nearby doctors
+\end{enumerate}
+
+\section{API Implementation}
+The system is implemented as a RESTful API using FastAPI.
+
+\subsection{API Endpoints}
+Key endpoints include:
+
+\begin{itemize}
+    \item \texttt{POST /predict/symptoms}: Predict from symptom list
+    \item \texttt{POST /predict/text}: Predict from natural language text
+    \item \texttt{POST /chat}: Conversational agent interaction
+    \item \texttt{POST /severity/check}: Severity assessment
+    \item \texttt{POST /first-aid/for-symptoms}: First aid guidance
+    \item \texttt{GET /symptoms}: List all symptoms
+    \item \texttt{GET /diseases}: List all diseases
+    \item \texttt{GET /health}: System health check
+\end{itemize}
+
+\subsection{Response Format}
+API responses follow a consistent structure:
+
+\begin{lstlisting}[language=Python, caption=Example API Response]
+{
+    "predictions": [
+        {
+            "disease": "Common Cold",
+            "probability": 0.85,
+            "confidence_percent": "85.0%",
+            "description": "Viral infection...",
+            "precautions": ["rest", "hydration"],
+            "severity_score": 2.5,
+            "severity_level": "MILD"
+        }
+    ],
+    "severity": {
+        "level": "MILD",
+        "score": 2.5,
+        "confidence": 0.8,
+        "reason": "Mild symptoms...",
+        "is_emergency": false
+    },
+    "recommended_specialist": {
+        "name": "General Practitioner",
+        "description": "...",
+        "icon": "👨‍⚕️"
+    }
+}
+\end{lstlisting}
+
+\section{Implementation Technologies}
+The system is implemented using:
+
+\begin{itemize}
+    \item \textbf{Python 3.8+}: Primary programming language
+    \item \textbf{FastAPI}: Web framework for API
+    \item \textbf{scikit-learn}: Machine learning library
+    \item \textbf{XGBoost}: Gradient boosting framework
+    \item \textbf{pandas/numpy}: Data manipulation
+    \item \textbf{joblib}: Model serialization
+    \item \textbf{uvicorn}: ASGI server
+\end{itemize}
+
+\section{Model Training and Evaluation}
+\subsection{Training Process}
+Models are trained using:
+
+\begin{itemize}
+    \item 80-20 train-test split
+    \item Stratified sampling for balanced classes
+    \item Cross-validation for hyperparameter tuning
+    \item Model persistence for production use
+\end{itemize}
+
+\subsection{Evaluation Metrics}
+The system is evaluated using:
+
+\begin{itemize}
+    \item Accuracy: Overall prediction correctness
+    \item Precision: Correct positive predictions
+    \item Recall: Ability to find all positive cases
+    \item F1-Score: Harmonic mean of precision and recall
+    \item Classification Report: Per-disease metrics
+\end{itemize}
+
+\section{System Deployment}
+The system can be deployed as:
+
+\begin{itemize}
+    \item Standalone API server
+    \item Docker container
+    \item Cloud service (AWS, Azure, GCP)
+    \item Integration with web/mobile applications
+\end{itemize}
